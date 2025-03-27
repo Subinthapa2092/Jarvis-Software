@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. - Mark VII</title>
+    <link rel="shortcut icon" href="avatar.png" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --jarvis-blue: #00bcd4;
+            --jarvis-dark: #001a20;
+            --jarvis-light: #aed0d0;
+            --jarvis-accent: #00ffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        body {
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .main-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+            background: radial-gradient(circle at center, #0a2e38 0%, #000000 100%);
+        }
+        
+        /* Left Panel - HUD Display */
+        .hud-panel {
+            width: 60%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(0, 188, 212, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hud-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(0, 188, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 188, 212, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+        
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            color: var(--jarvis-blue);
+            font-size: 0.9rem;
+        }
+        
+        .hud-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hud-image {
+            width: 400px;
+            height: 400px;
+            background: url('https://i.imgur.com/JYw7OlG.png') center/contain no-repeat;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 15px var(--jarvis-blue));
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .hud-text {
+            color: var(--jarvis-blue);
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--jarvis-blue);
+        }
+        
+        .hud-subtext {
+            color: var(--jarvis-light);
+            text-align: center;
+            font-size: 1rem;
+            max-width: 500px;
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, 
+                    rgba(0,0,0,0) 0%, 
+                    rgba(0,188,212,0.1) 50%, 
+                    rgba(0,0,0,0) 100%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        
+        /* Right Panel - Interface */
+        .interface-panel {
+            width: 40%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(0, 20, 30, 0.5);
+        }
+        
+        .interface-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .interface-title {
+            color: var(--jarvis-blue);
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+        }
+        
+        .interface-status {
+            color: var(--jarvis-light);
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border: 1px solid var(--jarvis-blue);
+            border-radius: 3px;
+        }
+        
+        .interface-image {
+            width: 100%;
+            height: 200px;
+            background: url('https://i.imgur.com/8Km9tLL.png') center/contain no-repeat;
+            margin-bottom: 30px;
+        }
+        
+        .command-input {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .command-input input {
+            flex-grow: 1;
+            background: rgba(0, 40, 50, 0.5);
+            border: 1px solid var(--jarvis-blue);
+            color: var(--jarvis-light);
+            padding: 12px 15px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .command-input button {
+            width: 50px;
+            background: var(--jarvis-blue);
+            border: none;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .command-input button:hover {
+            background: var(--jarvis-accent);
+        }
+        
+        .voice-command {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--jarvis-blue) 0%, #005566 100%);
+            border: none;
+            color: #000;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--jarvis-blue);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .voice-btn:hover {
+            box-shadow: 0 0 30px var(--jarvis-accent);
+        }
+        
+        .voice-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--jarvis-blue);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .command-list {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        
+        .command-item {
+            background: rgba(0, 30, 40, 0.3);
+            border-left: 3px solid var(--jarvis-blue);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            color: var(--jarvis-light);
+            font-size: 0.9rem;
+        }
+        
+        .command-item .time {
+            color: var(--jarvis-blue);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .hud-panel, .interface-panel {
+                width: 100%;
+            }
+            
+            .hud-panel {
+                height: 50vh;
+            }
+            
+            .interface-panel {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Panel - HUD Display -->
+        <div class="hud-panel">
+            <div class="hud-overlay"></div>
+            <div class="scanlines"></div>
+            
+            <div class="status-header">
+                <div>J.A.R.V.I.S. MARK VII</div>
+                <div>STARK INDUSTRIES</div>
+                <div>SECURE CONNECTION</div>
+            </div>
+            
+            <div class="hud-main">
+                <div class="hud-image"></div>
+                <div class="hud-text">JUST A RATHER VERY INTELLIGENT SYSTEM</div>
+                <div class="hud-subtext">Advanced AI interface developed by Stark Industries for comprehensive environmental interaction and control</div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Interface -->
+        <div class="interface-panel">
+            <div class="interface-header">
+                <div class="interface-title">COMMAND INTERFACE</div>
+                <div class="interface-status">ONLINE</div>
+            </div>
+            
+            <div class="interface-image"></div>
+            
+            <div class="command-input">
+                <input type="text" placeholder="Enter command..." id="commandInput">
+                <button id="textCommandBtn"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+            <div class="voice-command">
+                <button class="voice-btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
+            </div>
+            
+            <div class="command-list" id="commandList">
+                <div class="command-item">
+                    <div class="time">[22:34:17] SYSTEM INITIALIZED</div>
+                    <div>JARVIS online and ready</div>
+                </div>
+                <div class="command-item">
+                    <div class="time">[22:34:23] SECURITY SCAN</div>
+                    <div>All systems secure. No intrusions detected</div>
+                </div>
+                <div class="command-item">
+                    <div class="time">[22:34:30] USER AUTHENTICATION</div>
+                    <div>Welcome back, Sir</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const voiceBtn = document.getElementById('voiceBtn');
+        const commandInput = document.getElementById('commandInput');
+        const commandList = document.getElementById('commandList');
+        const textCommandBtn = document.getElementById('textCommandBtn');
+        
+        // Add command to history
+        function addCommand(text, isSystem = false) {
+            const now = new Date();
+            const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+            
+            const commandItem = document.createElement('div');
+            commandItem.className = 'command-item';
+            
+            if (isSystem) {
+                commandItem.innerHTML = `
+                    <div class="time">${timeString} SYSTEM RESPONSE</div>
+                    <div>${text}</div>
+                `;
+            } else {
+                commandItem.innerHTML = `
+                    <div class="time">${timeString} USER COMMAND</div>
+                    <div>${text}</div>
+                `;
+            }
+            
+            commandList.prepend(commandItem);
+            commandList.scrollTop = 0;
+        }
+        
+        // Text-to-speech function
+        function speak(text) {
+            addCommand(text, true);
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
+            utterance.volume = 1;
+            
+            // Find a male voice if available
+            const voices = window.speechSynthesis.getVoices();
+            const maleVoice = voices.find(voice => voice.name.includes('Male'));
+            if (maleVoice) {
+                utterance.voice = maleVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
+        }
+        
+        // Process commands
+        function processCommand(command) {
+            command = command.toLowerCase();
+            
+            // Greeting responses
+            if (command.includes('hello') || command.includes('jarvis') || command.includes('hey')) {
+                const hour = new Date().getHours();
+                if (hour < 12) {
+                    speak("Good morning, Sir. How may I assist you?");
+                } else if (hour < 18) {
+                    speak("Good afternoon, Commander. What can I do for you?");
+                } else {
+                    speak("Good evening, Director. How may I help?");
+                }
+            } 
+            // Developer/Creator information
+            else if (command.includes('who made you') || command.includes('who created you') || 
+                     command.includes('who developed you') || command.includes('who built you') ||
+                     command.includes('who are your creator') || command.includes('who designed you')) {
+                speak("I was developed by Subin Thapa, an extraordinary visionary and creator.");
+            }
+            // Time and date
+            else if (command.includes('time')) {
+                const time = new Date().toLocaleTimeString();
+                speak(`The current time is ${time}`);
+            }
+            else if (command.includes('date')) {
+                const date = new Date().toLocaleDateString();
+                speak(`Today's date is ${date}`);
+            }
+            // Website commands
+            else if (command.includes('open')) {
+                if (command.includes('google')) {
+                    speak("Opening Google");
+                    window.open('https://google.com', '_blank');
+                }
+                else if (command.includes('youtube')) {
+                    speak("Accessing YouTube");
+                    window.open('https://youtube.com', '_blank');
+                }
+                else if (command.includes('facebook')) {
+                    speak("Opening Facebook");
+                    window.open('https://facebook.com', '_blank');
+                }
+                else if (command.includes('twitter') || command.includes('x.com')) {
+                    speak("Accessing Twitter");
+                    window.open('https://twitter.com', '_blank');
+                }
+                else if (command.includes('instagram')) {
+                    speak("Launching Instagram");
+                    window.open('https://instagram.com', '_blank');
+                }
+                else if (command.includes('wikipedia')) {
+                    speak("Opening Wikipedia");
+                    window.open('https://wikipedia.org', '_blank');
+                }
+                else if (command.includes('amazon')) {
+                    speak("Accessing Amazon");
+                    window.open('https://amazon.com', '_blank');
+                }
+                else if (command.includes('netflix')) {
+                    speak("Launching Netflix");
+                    window.open('https://netflix.com', '_blank');
+                }
+                else if (command.includes('reddit')) {
+                    speak("Opening Reddit");
+                    window.open('https://reddit.com', '_blank');
+                }
+                else {
+                    // Try to extract the website name from the command
+                    const website = command.replace('open', '').replace('please', '').trim();
+                    if (website) {
+                        speak(`Attempting to access ${website}`);
+                        window.open(`https://${website}.com`, '_blank');
+                    } else {
+                        speak("Please specify which website to open");
+                    }
+                }
+            }
+            // System commands
+            else if (command.includes('system status') || command.includes('diagnostic')) {
+                speak("All systems operational. Power at 98.7%. No security breaches detected.");
+            }
+            else if (command.includes('armor status')) {
+                speak("All Mark VII armor systems nominal. Weapons systems ready. Flight systems at 100%.");
+            }
+            // Search commands
+            else if (command.includes('search for') || command.includes('look up')) {
+                const query = command.replace('search for', '').replace('look up', '').trim();
+                if (query) {
+                    speak(`Searching for ${query}`);
+                    window.open(`https://google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                } else {
+                    speak("What would you like me to search for?");
+                }
+            }
+            // Calculator
+            else if (command.includes('calculate') || command.includes('math')) {
+                const expression = command.replace('calculate', '').replace('math', '').trim();
+                if (expression) {
+                    try {
+                        const result = eval(expression);
+                        speak(`The result is ${result}`);
+                    } catch {
+                        speak("I couldn't perform that calculation");
+                    }
+                } else {
+                    speak("What would you like me to calculate?");
+                }
+            }
+            // Help command
+            else if (command.includes('help') || command.includes('what can you do')) {
+                speak("I can open websites, tell time, perform calculations, search the web, and provide system diagnostics. Try saying 'open YouTube', 'what time is it', or 'search for artificial intelligence'");
+            }
+            // Default response
+            else {
+                speak("Command not recognized. For assistance, say 'help'");
+            }
+        }
+        
+        // Voice recognition setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onstart = () => {
+                voiceBtn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                voiceBtn.style.boxShadow = '0 0 30px #ff0000';
+                addCommand("Listening...", true);
+            };
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                commandInput.value = transcript;
+                addCommand(transcript);
+                processCommand(transcript);
+            };
+            
+            recognition.onerror = (event) => {
+                addCommand(`Error: ${event.error}`, true);
+            };
+            
+            recognition.onend = () => {
+                voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                voiceBtn.style.boxShadow = '0 0 20px var(--jarvis-blue)';
+            };
+            
+            voiceBtn.addEventListener('click', () => {
+                recognition.start();
+            });
+        } else {
+            voiceBtn.style.display = 'none';
+            addCommand("Voice recognition not supported in this browser", true);
+        }
+        
+        // Text command input
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = commandInput.value.trim();
+                if (command) {
+                    addCommand(command);
+                    processCommand(command);
+                    commandInput.value = '';
+                }
+            }
+        });
+        
+        textCommandBtn.addEventListener('click', () => {
+            const command = commandInput.value.trim();
+            if (command) {
+                addCommand(command);
+                processCommand(command);
+                commandInput.value = '';
+            }
+        });
+        
+        // Initialization
+        window.addEventListener('load', () => {
+            // Load voices for speech synthesis
+            window.speechSynthesis.onvoiceschanged = function() {
+                // Voices are now loaded
+            };
+            
+            setTimeout(() => {
+                const hour = new Date().getHours();
+                let greeting;
+                if (hour < 12) {
+                    greeting = "Good morning";
+                } else if (hour < 18) {
+                    greeting = "Good afternoon";
+                } else {
+                    greeting = "Good evening";
+                }
+                speak(`${greeting}, Sir. JARVIS online. All systems operational.`);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
